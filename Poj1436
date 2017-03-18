@@ -1,0 +1,110 @@
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+#define maxn 16001
+#define lson root<<1
+#define rson root<<1|1
+struct node1
+{
+    int l,r,color;
+} f[maxn];
+struct node2
+{
+    int y1,y2,v;
+} a[maxn*2];
+bool mark[maxn*2][maxn*2];
+void build( int root,int left,int right)
+{
+    f[root].l=left;
+    f[root].r=right;
+    f[root].color = 0;
+    if(left==right) return;
+    printf("root:%d\n",root);
+    int mid=(left+right)>>1;
+    build(lson,left,mid);
+    build(rson,mid+1,right);
+}
+void lazy(int root)
+{
+    if( f[ root ].color != -1)
+    {
+        f[lson].color = f[root].color;
+        f[rson].color = f[root].color;
+        f[root].color = -1;
+    }
+}
+void update(int root,int left,int right,int val)
+{
+    if(left<=f[root].l && f[root].r<=right)
+    {
+        f[root].color = val;
+        return;
+    }
+    else
+    {
+        lazy(root);
+        if(left<=f[lson].r) update(lson,left,right,val);
+        if(right>=f[rson].l) update(rson,left,right,val);
+    }
+}
+
+void query( int root,int left,int right,int val)
+{
+    if (f[root].color != -1)
+    {
+        mark[f[root].color][val] = true;
+        return;
+    }
+    if (f[root].l==f[root].r) return;
+    lazy(root);
+    if(left<=f[lson].r) query(lson,left,right,val);
+    if(right>=f[rson].l) query(rson,left,right,val);
+}
+
+bool cmp(node2 a,node2 b)
+{
+    return a.v<b.v;
+}
+int main()
+{
+    int t;
+    int n,i,j,k;
+    freopen("1436.in","r",stdin);
+    freopen("1436.out","w",stdout);
+    scanf("%d",&t);
+    while(t--)
+    {
+        scanf("%d",&n);
+        for(i=1; i<=n; i++)
+        {
+            scanf("%d%d%d",&a[i].y1,&a[i].y2,&a[i].v);
+            a[i].y1+=a[i].y1;
+            a[i].y2+=a[i].y2;
+        }
+        sort(a+1,a+n+1,cmp);
+        memset(mark,false,sizeof(mark));
+        build(1,0,maxn);
+        for(i=1; i<=n; i++)
+        {
+            query(1,a[i].y1,a[i].y2,i);
+            update(1,a[i].y1,a[i].y2,i);
+        }
+        int ans=0;
+        for(i=1; i<=n; i++)
+        {
+            for(j=1; j<=n; j++)
+            {
+                if(mark[i][j])for(k=1; k<=n; k++)
+                    {
+                        if(mark[i][k]&&mark[j][k])ans++;
+                    }
+            }
+        }
+        printf("%d\n",ans);
+    }
+    fclose(stdin);
+    fclose(stdout);
+}
