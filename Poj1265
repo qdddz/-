@@ -1,0 +1,45 @@
+#include<stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#define CROSS_PRODUCT(x1,y1,x2,y2) ((x1)*(y2)-(x2)*(y1))
+int gcd(int a,int b){
+	if(b==0) return a;
+	return gcd(b,a%b);
+}
+/* 
+Pick theorem : Area = I + E/2 - 1
+ I : grid points inside the polygon
+ E : grid points on the edges.
+So  2*I = 2*Area +2 - E
+*/
+int solve(){
+	int m; // number of edges
+	int I,E,Area;
+	int x[2],y[2],dx,dy,i,j;
+	Area=E=0;
+	scanf("%d",&m);
+	x[0]=y[0]=0;
+	for(i=0;m;m--){
+		scanf("%d %d",&dx,&dy);
+		j = (i+1)%2;
+		x[j]=x[i]+dx;
+		y[j]=y[i]+dy;
+		E += gcd(abs(dx),abs(dy));
+		Area += CROSS_PRODUCT(x[i],y[i],x[j],y[j]);
+		i = j;
+	}
+	I = (Area+2-E)>>1;
+	printf("%d %d %.1f\n",I,E,(float)Area/2);
+	return 0;
+}
+int main(){
+	int CASE;
+	int i;
+	scanf("%d",&CASE);
+	for(i=1;i<=CASE;i++){
+		printf("Scenario #%d:\n",i);
+		solve();
+		printf("\n");
+	}
+	return 0;
+}
