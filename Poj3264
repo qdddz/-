@@ -1,0 +1,44 @@
+#include<cstdio>
+#include<cstdlib>
+#include<cmath>
+int n,f[50001][20]= {0},a[50001][20]= {0};
+int max(int x, int y)
+{
+	return (x>y)?x:y;
+}
+int min(int x, int y)
+{
+	return (x<y)?x:y;
+}
+int querymax(int s, int t)
+{
+	int k=(int)(log(t-s+1)/log(2));
+	return max(f[s][k], f[t-(1<<k)+1][k]);
+}
+int querymin(int s, int t)
+{
+	int k=(int)(log(t-s+1)/log(2));
+	return min(a[s][k], a[t-(1<<k)+1][k]);
+}
+int main()
+{
+	int q,l,r;
+	scanf("%d %d",&n,&q);
+	for(int i=1; i<=n; i++)
+		{
+			scanf("%d",&f[i][0]);
+			a[i][0] = f[i][0];
+		}
+	int p=(int)(log(n)/log(2));
+	for(int j=1; j<=p; j++)
+		for(int i=1; i<=n-(1<<j)+1; i++)
+			{
+				f[i][j]=max(f[i][j-1], f[i+(1<<(j-1))][j-1]);
+				a[i][j]=min(a[i][j-1], a[i+(1<<(j-1))][j-1]);
+			}
+	for(int i=1; i<=q; i++)
+		{
+			scanf("%d %d",&l,&r);
+			printf("%d\n",querymax(l,r)-querymin(l,r));
+		}
+}
